@@ -1,0 +1,1 @@
+Simple GUI to demonstrate the OSKAR project.
