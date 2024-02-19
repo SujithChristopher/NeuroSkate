@@ -106,7 +106,6 @@ class MainWindow(QMainWindow):
         
         self.start_button = QPushButton("Start")
         self.start_button.setStyleSheet(get_button_ss())
-        # self.start_button.clicked.connect(self.create_vtk_scene())
         
         self.zero_button = QPushButton("Set-Zero")
         self.zero_button.setStyleSheet(get_button_ss())
@@ -442,10 +441,7 @@ class MainWindow(QMainWindow):
                             self.rmat = cv2.Rodrigues(self.rvec_88)[0]
                         if self.rvec_89 is not np.nan:
                             _r = cv2.Rodrigues(self.rvec_89)[0]
-                            self.rmat = _r @ self.p_90
-                        
-                        # self.set_pose()
-                        
+                            self.rmat = _r @ self.p_90                        
                         if not self.RMAT_INIT:
                             self.initial_rmat = self.rmat
                             self.RMAT_INIT = True
