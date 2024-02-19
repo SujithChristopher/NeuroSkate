@@ -10,7 +10,7 @@ from ultralytics import YOLO
 import os
 import msgpack as mp
 import msgpack_numpy as mpn
-from support import *
+from py_programs.support import *
 from py_programs.py_toggle import AnimatedToggle
 from scipy.spatial.transform import Rotation as R
 
