@@ -29,3 +29,4 @@ def get_label_ss():
             color: #333;
             font-weight: bold;
         """
+        
