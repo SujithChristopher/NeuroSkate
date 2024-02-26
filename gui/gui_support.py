@@ -30,3 +30,20 @@ def get_label_ss():
             font-weight: bold;
         """
         
+def get_dropdown_ss():
+    return """
+            QComboBox {
+                border: 1px solid gray;
+                border-radius: 3px;
+                padding: 1px 18px 1px 3px;
+                min-width: 6em;
+            }
+            QComboBox::drop-down {
+                subcontrol-origin: padding;
+                subcontrol-position: top right;
+                width: 15px;
+                border-left-width: 1px;
+                border-left-color: darkgray;
+                border-left-style: solid;
+            }
+        """
