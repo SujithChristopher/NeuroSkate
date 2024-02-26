@@ -10,8 +10,8 @@ from ultralytics import YOLO
 import os
 import msgpack as mp
 import msgpack_numpy as mpn
-from py_programs.gui_support import *
-from py_programs.toggle_button import AnimatedToggle
+from gui.gui_support import *
+from gui.toggle_button import AnimatedToggle
 from scipy.spatial.transform import Rotation as R
 
 from py_programs.gui import create_layout

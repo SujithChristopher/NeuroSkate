@@ -20,3 +20,6 @@ cad = "./models/3D_models.stl"
 # Camera variables
 [camera]
 resolution = [ 720, 1280, ] # [height, width]
+
+[display]
+display = false

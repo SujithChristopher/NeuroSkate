@@ -47,7 +47,7 @@ class MainWindow(QMainWindow):
 
         self.init_parameters()
         self.buttons_connect()
-
+        
     def select_camera(self):
         self.camera.release()
         self.camera = cv2.VideoCapture(self.viewTab.camera_dropdown.currentIndex())

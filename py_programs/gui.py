@@ -1,8 +1,8 @@
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
-from py_programs.gui_support import *
-from py_programs.toggle_button import *
+from gui.gui_support import *
+from gui.toggle_button import *
 import vtk
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
