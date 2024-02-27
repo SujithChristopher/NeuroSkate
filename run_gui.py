@@ -3,7 +3,8 @@ import toml
 from calibration.aruco_parameters import *
 from gui.gui_design import *
 from PySide6.QtMultimedia import *
-
+from support.udp import *
+import socket
 
 _toml_pth = "settings.toml"
 if os.path.exists(_toml_pth):
@@ -48,6 +49,10 @@ class MainWindow(QMainWindow):
         self.init_parameters()
         self.buttons_connect()
         
+        if settings['stream_data']['udp']:
+            self.socket = init_udp()
+            self.socket.sendto(b"Initialized UDP stream", (settings['stream_data']['ip'], settings['stream_data']['port']))
+            
     def select_camera(self):
         self.camera.release()
         self.camera = cv2.VideoCapture(self.viewTab.camera_dropdown.currentIndex())

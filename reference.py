@@ -14,7 +14,7 @@ from gui.gui_support import *
 from gui.toggle_button import AnimatedToggle
 from scipy.spatial.transform import Rotation as R
 
-from py_programs.gui import create_layout
+from support.gui import create_layout
 import mediapipe as m_pipe
 
 model = YOLO("./models/mip_ar_200e_noise.pt")
@@ -75,7 +75,6 @@ class MainWindow(QMainWindow):
         self.inference = "YOLO"
 
         create_layout(self)
-
         self.capture = cv2.VideoCapture(0)
         self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
         self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)

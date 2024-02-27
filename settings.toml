@@ -21,5 +21,10 @@ cad = "./models/3D_models.stl"
 [camera]
 resolution = [ 720, 1280, ] # [height, width]
 
+[stream_data]
+udp = true
+ip = "127.0.0.1"
+port = 8000
+
 [display]
 display = false
