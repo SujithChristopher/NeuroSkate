@@ -33,6 +33,9 @@ class ViewTab(QWidget):
 
         self.zero_button = QPushButton("Set-Zero")
         self.zero_button.setStyleSheet(get_button_ss())
+        
+        self.update_calib_button = QPushButton("Update")
+        self.update_calib_button.setStyleSheet(get_button_ss())
 
         """Coordinate display label"""
         self.x_coord_label = QLabel()
@@ -121,6 +124,7 @@ class ViewTab(QWidget):
         self.vbox.addWidget(self.sub_hbox_widget_mp)
         self.vbox.addWidget(self.start_button)
         self.vbox.addWidget(self.zero_button)
+        self.vbox.addWidget(self.update_calib_button)
         self.vbox.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
         self.vbox_widget = QWidget()
         self.vbox_widget.setLayout(self.vbox)
@@ -141,7 +145,7 @@ class CalibrationTab(QWidget):
         
         self.corner_label = QLabel("No of Corners")
         self.corner_label.setStyleSheet(get_label_ss())
-        self.corner_disp_label = QLabel("arr")
+        self.corner_disp_label = QLabel("TBD")
         self.corner_disp_label.setStyleSheet(get_label_ss())
         
         self.total_frames_label = QLabel("Total Frames")

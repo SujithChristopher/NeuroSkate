@@ -6,17 +6,6 @@ from PySide6.QtMultimedia import *
 from support.udp import *
 import socket
 
-_toml_pth = "settings.toml"
-if os.path.exists(_toml_pth):
-    settings = toml.load(_toml_pth)
-    cameraMatrix, dist_coeffs = settings['calibration']["camera_matrix"], settings['calibration']["dist_coeffs"]
-    cameraMatrix = np.array(cameraMatrix).reshape(3, 3)
-    dist_coeffs = np.array(dist_coeffs)
-else:
-    print("Calibration file missing/corrupted, defaulting to identity")
-    cameraMatrix, dist_coeffs = np.eye(3), np.zeros((1, 5))
-
-
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -47,13 +36,32 @@ class MainWindow(QMainWindow):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_frame)
         self.timer.start()  # 30 fps 
-
+        
+        self.udp_timer = QTimer(self)
+        self.udp_timer.timeout.connect(self.start_udp_stream)
+        self.udp_timer.start()
+        
+        self.tvec = np.zeros((1,1,3))
+        self.rvec = np.zeros((1,1,3))
+        self.udp_stream = True
+        
+        self._toml_pth = "settings.toml"
+        
+        if os.path.exists(self._toml_pth):
+            self.settings = toml.load(self._toml_pth)
+            self.cameraMatrix, self.dist_coeffs = self.settings['calibration']["camera_matrix"], self.settings['calibration']["dist_coeffs"]
+            self.cameraMatrix = np.array(self.cameraMatrix).reshape(3, 3)
+            self.dist_coeffs = np.array(self.dist_coeffs)
+        else:
+            print("Calibration file missing/corrupted, defaulting to identity")
+            self.cameraMatrix, self.dist_coeffs = np.eye(3), np.zeros((1, 5))
+        
+        if self.settings['stream_data']['udp']:
+            self.socket = init_udp()
+            print("UDP stream initialized")
+            
         self.init_parameters()
         self.buttons_connect()
-        
-        if settings['stream_data']['udp']:
-            self.socket = init_udp()
-            self.socket.sendto(b"Initialized UDP stream", (settings['stream_data']['ip'], settings['stream_data']['port']))
             
     def select_camera(self):
         self.camera.release()
@@ -66,20 +74,42 @@ class MainWindow(QMainWindow):
         self.ar_parameters = get_aruco_parameters()
         self.ar_dict = get_aruco_dictionary(aruco.DICT_ARUCO_ORIGINAL)
         self.board = get_board()
-        self.marker_size = settings['aruco']['marker_length']
-        self.marker_spacing = settings['aruco']['marker_spacing']
+        self.marker_size = self.settings['aruco']['marker_length']
+        self.marker_spacing = self.settings['aruco']['marker_spacing']
 
     def buttons_connect(self):
-        
-        # self.viewTab.start_button.clicked.connect()
+        self.viewTab.update_calib_button.clicked.connect(self.update_calibration)
         self.calibrationTab.start_button.clicked.connect(self.init_calib_params)
         self.calibrationTab.stop_button.clicked.connect(
             lambda: setattr(self, 'start_calibration', not self.start_calibration))
         self.calibrationTab.calibrate_button.clicked.connect(self.calibrate_camera)
         
+    def update_calibration(self):
+        _toml_pth = "settings.toml"
+        if os.path.exists(_toml_pth):
+            self.settings = toml.load(_toml_pth)
+            self.cameraMatrix, self.dist_coeffs = self.settings['calibration']["camera_matrix"], self.settings['calibration']["dist_coeffs"]
+            self.cameraMatrix = np.array(self.cameraMatrix).reshape(3, 3)
+            self.dist_coeffs = np.array(self.dist_coeffs)
+        else:
+            print("Calibration file missing/corrupted, defaulting to identity")
+            self.cameraMatrix, self.dist_coeffs = np.eye(3), np.zeros((1, 5))
+        
+        print("Calibration updated")
+        
+    def start_udp_stream(self):
+        if self.udp_stream:
+            data, addr = self.socket.recvfrom(1024)
+            print(addr)
+            self.socket.sendto(str(self.tvec[0][0][0]).encode(), addr)           
+            
     def start_aruco_pose(self):
-        ...
+        self.tvec, self.rvec, _ = aruco.estimatePoseSingleMarkers(self.corners, self.marker_size, self.cameraMatrix, self.dist_coeffs)
+        self.viewTab.x_coord_label.setText(str(round(self.tvec[0][0][0]*100, 2)))
+        self.viewTab.y_coord_label.setText(str(round(self.tvec[0][0][1]*100, 2)))
+        self.viewTab.z_coord_label.setText(str(round(self.tvec[0][0][2]*100, 2)))
 
+                
     def init_calib_params(self):
         [self.corners_list, self.ids_list, self.counter] = [], [], []
         self.start_calibration = True
@@ -94,8 +124,8 @@ class MainWindow(QMainWindow):
             self.corners_list = np.vstack((self.corners_list, self.corners))
             self.ids_list = np.vstack((self.ids_list, self.ids))
         self.counter.append(len(self.ids))
-        self.calibrationTab.corner_label.setText(str(len(self.corners_list)))
-        self.calibrationTab.total_frames_label.setText(str(sum(self.counter)))
+        self.calibrationTab.corner_label.setText("Corners " + str(len(self.corners_list)))
+        self.calibrationTab.total_frames_label.setText("Frames " + str(len(self.counter)))
 
     def calibrate_camera(self):
         mtx2 = np.zeros((3, 3))
@@ -129,10 +159,10 @@ class MainWindow(QMainWindow):
 
         self.calibrationTab.progress_bar.setValue(100)
 
-        data = toml.load(_toml_pth)
+        data = toml.load(self._toml_pth)
         data['calibration']['camera_matrix'] = mtx1.tolist()
         data['calibration']['dist_coeffs'] = dist1.tolist()
-        with open(_toml_pth, 'w') as f:
+        with open(self._toml_pth, 'w') as f:
             toml.dump(data, f)
         self.calibrationTab.progress_text.setText("Calibration done")
 
@@ -141,8 +171,8 @@ class MainWindow(QMainWindow):
         corners, ids, _, _ = self.ar_detector.refineDetectedMarkers(image, board=self.board,
                                                                     detectedCorners=corners, detectedIds=ids,
                                                                     rejectedCorners=rejectedImgPoints,
-                                                                    cameraMatrix=cameraMatrix,
-                                                                    distCoeffs=dist_coeffs)
+                                                                    cameraMatrix=self.cameraMatrix,
+                                                                    distCoeffs=self.dist_coeffs)
         return corners, ids
 
     def change_format(self, image):
@@ -168,6 +198,9 @@ class MainWindow(QMainWindow):
             if ids is not None:
                 self.colorImage = aruco.drawDetectedMarkers(self.colorImage, corners, ids)
 
+                if self.active_tab == 0:
+                    self.start_aruco_pose()
+                
                 if self.start_calibration:
                     self.collect_corners()
 
