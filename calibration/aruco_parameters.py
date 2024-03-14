@@ -4,7 +4,7 @@ import cv2
 def get_aruco_parameters():
     return aruco.DetectorParameters()
 
-def get_aruco_dictionary(DICT = aruco.DICT_ARUCO_ORIGINAL):
+def get_aruco_dictionary(DICT = aruco.DICT_ARUCO_MIP_36h12):
     return aruco.getPredefinedDictionary(DICT)
 
 def get_aruco_detector():

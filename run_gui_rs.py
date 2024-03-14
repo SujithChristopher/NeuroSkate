@@ -5,6 +5,9 @@ from gui.gui_design import *
 from PySide6.QtMultimedia import *
 from support.udp import *
 import socket
+import pyrealsense2 as rs
+
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -72,7 +75,7 @@ class MainWindow(QMainWindow):
     def init_parameters(self):
         self.ar_detector = get_aruco_detector()
         self.ar_parameters = get_aruco_parameters()
-        self.ar_dict = get_aruco_dictionary(aruco.DICT_ARUCO_ORIGINAL)
+        self.ar_dict = get_aruco_dictionary(aruco.DICT_ARUCO_MIP_36h12)
         self.board = get_board()
         self.marker_size = self.settings['aruco']['marker_length']
         self.marker_spacing = self.settings['aruco']['marker_spacing']
@@ -128,17 +131,10 @@ class MainWindow(QMainWindow):
         self.calibrationTab.total_frames_label.setText("Frames " + str(len(self.counter)))
 
     def calibrate_camera(self):
-        """
-        A function to calibrate the camera using a set of images and Aruco markers.
-        """
         mtx2 = np.zeros((3, 3))
         dist2 = np.zeros((1, 8))
         calibration_flags = cv2.CALIB_USE_LU
         term_criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 1e-6)
-        
-        if len(self.counter) == 0:
-            raise ValueError("No frames collected for calibration.")
-
         rnd = np.random.choice(len(self.counter), 150, replace=False)
         self.counter = np.array(self.counter)
         mask = np.ones(len(self.corners_list), dtype=bool)
@@ -156,21 +152,15 @@ class MainWindow(QMainWindow):
             if idx not in rnd:
                 mask[previous_index:current_index] = False
 
-        if not mask.any():
-            raise ValueError("No valid frames collected for calibration.")
-
         selected_corners = self.corners_list[mask, ...]
         selected_ids = self.ids_list[mask, ...]
         selected_counter = self.counter[rnd]
 
         _, mtx1, dist1, _, _ = aruco.calibrateCameraAruco(selected_corners, selected_ids, selected_counter, self.board,
-                                                          self.colorImage.shape[:2], mtx2, dist2,
+                                                          self.colorImage.shape[:2], mtx2, mtx2, dist2,
                                                           flags=calibration_flags, criteria=term_criteria)
 
         self.calibrationTab.progress_bar.setValue(100)
-
-        if self._toml_pth is None:
-            raise ValueError("Camera calibration file path not set.")
 
         data = toml.load(self._toml_pth)
         data['calibration']['camera_matrix'] = mtx1.tolist()
@@ -191,8 +181,9 @@ class MainWindow(QMainWindow):
     def change_format(self, image):
         h1, w1, ch = image.shape
         bytes_per_line = w1 * ch
-        qimage = QImage(image.data.tobytes(), w1, h1, bytes_per_line, QImage.Format_RGB888)
-        return QPixmap.fromImage(qimage)
+        convert_to_qt_format = QImage(image.data.tobytes(), w1, h1, bytes_per_line, QImage.Format_RGB888)
+        pixmap = QPixmap.fromImage(convert_to_qt_format)
+        return pixmap
 
     def get_active_tab(self):
         return self.tabs.currentWidget()

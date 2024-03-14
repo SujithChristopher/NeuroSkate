@@ -50,14 +50,13 @@ class MainWindow(QMainWindow):
             self.cameraMatrix, self.dist_coeffs = np.eye(3), np.zeros((1, 5))
         
         if self.settings['stream_data']['udp']:
+            self.udp_stream = True
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,)
             self.socket.bind(("localhost", 12345))
-            # self.socket.sendto("hello".encode(), ("localhost", 12345))
             print("UDP stream initialized")
  
         self.tvec = np.zeros((1,1,3))
         self.rvec = np.zeros((1,1,3))
-        self.udp_stream = True
             
         self.init_parameters()
         self.buttons_connect()
