@@ -128,7 +128,7 @@ class MainWindow(QMainWindow):
         self.vbox.addWidget(self.vtk_widget)
         self.vbox.addWidget(self.start_button)
         
-        self.capture = cv2.VideoCapture(0)
+        self.capture = cv2.VideoCapture(1, cv2.CAP_DSHOW)
         self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
         self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)        
         self.capture.set(cv2.CAP_PROP_FPS, 60)
@@ -405,7 +405,7 @@ class MainWindow(QMainWindow):
                                             
                 if self.inference == "YOLO":
                     
-                    yolo_results = model.predict(self.colorImage, verbose=False, imgsz=640)[0]
+                    yolo_results = model.predict(self.colorImage, verbose=False, imgsz=640, conf=0.7)[0]
                     self.colorImage = yolo_results.plot()
                     modelcorners = []
                     for _keys in yolo_results.keypoints.data:
