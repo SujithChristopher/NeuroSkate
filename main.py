@@ -405,7 +405,7 @@ class MainWindow(QMainWindow):
                                             
                 if self.inference == "YOLO":
                     
-                    yolo_results = model.predict(self.colorImage, verbose=False, imgsz=640, conf=0.7)[0]
+                    yolo_results = model.predict(self.colorImage, verbose=False, imgsz=640, conf=0.8)[0]
                     self.colorImage = yolo_results.plot()
                     modelcorners = []
                     for _keys in yolo_results.keypoints.data:
