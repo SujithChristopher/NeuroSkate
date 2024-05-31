@@ -10,5 +10,6 @@ A simple GUI to demonstrate the NeuroSkate project. This skateboard is especiall
 
 
 This work is part of my MS Thesis, guided by Dr. Sivakumar Balasubramanian, Head of the Bioengineering Department and BioRehabGroup (https://biorehab.github.io/).
+
 <img src="src/logo.png" alt="drawing" width="200"/>
 <!-- ![Alt text](src/logo.png) -->
