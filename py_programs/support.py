@@ -1,4 +1,3 @@
-
 def get_button_ss():
     return """
             QPushButton {
@@ -21,6 +20,7 @@ def get_button_ss():
                 background-color: #0E8A19; /* Pressed Green */
             }
         """
+
 
 def get_label_ss():
     return """
