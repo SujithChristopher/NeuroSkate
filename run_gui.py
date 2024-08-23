@@ -36,7 +36,7 @@ class MainWindow(QMainWindow):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_frame)
         self.timer.start()  # 30 fps 
-        
+        # self.timer.stop()
         self.udp_timer = QTimer(self)
         self.udp_timer.timeout.connect(self.start_udp_stream)
         self.udp_timer.start()
