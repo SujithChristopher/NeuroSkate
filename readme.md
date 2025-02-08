@@ -9,7 +9,7 @@ A simple GUI to demonstrate the NeuroSkate project. This skateboard is especiall
 ![alt text](src/demo.gif)
 
 
-This work is part of my MS Thesis, guided by Dr. Sivakumar Balasubramanian, Head of the Bioengineering Department and BioRehabGroup (https://biorehab.github.io/).
-
+This work is part of my MS Thesis, guided by Dr. Sivakumar Balasubramanian, Head of the Bioengineering Department and BioRehabGroup (https://biorehab.github.io/). Part of the work is patented with the Indian Patent Office (202541006822).
+ 
 <img src="src/logo.png" alt="drawing" width="200"/>
 <!-- ![Alt text](src/logo.png) -->
